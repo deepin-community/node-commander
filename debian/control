@@ -1,0 +1,30 @@
+Source: node-commander
+Maintainer: Debian Javascript Maintainers <pkg-javascript-devel@lists.alioth.debian.org>
+Uploaders: Leo Iannacone <l3on@ubuntu.com>
+Section: javascript
+Priority: optional
+Testsuite: autopkgtest-pkg-nodejs
+Build-Depends: debhelper-compat (= 13)
+ , jest <!nocheck>
+ , dh-sequence-nodejs
+Standards-Version: 4.5.1
+Vcs-Browser: https://salsa.debian.org/js-team/node-commander
+Vcs-Git: https://salsa.debian.org/js-team/node-commander.git
+Homepage: https://github.com/tj/commander.js
+Rules-Requires-Root: no
+
+Package: node-commander
+Architecture: all
+Depends: ${misc:Depends}
+ , nodejs (>= 6.11.2)
+Breaks: uglifyjs (<< 3.9.4-2~)
+Multi-Arch: foreign
+Description: Complete solution for Node.js command-line interfaces
+ Commander is a light-weight, expressive, and powerful command-line framework
+ for Node.js.
+ .
+ Inspired by Ruby's commander, this Node.js module provides command line
+ option parsing, automated/customizable help texts, command line prompting
+ password query, and many more features.
+ .
+ Node.js is an event-based server-side JavaScript engine.

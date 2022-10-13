@@ -1,0 +1,214 @@
+node-commander (6.2.1-2) unstable; urgency=medium
+
+  * Team upload
+  * Back to unstable after successful tests
+
+ -- Xavier Guimard <yadd@debian.org>  Thu, 24 Dec 2020 05:39:53 +0100
+
+node-commander (6.2.1-1) experimental; urgency=medium
+
+  * Team upload
+
+  [ Debian Janitor ]
+  * Set upstream metadata fields: Bug-Submit.
+  * Remove obsolete fields Contact, Name from debian/upstream/metadata
+    (already present in machine-readable debian/copyright).
+  * Set upstream metadata fields: Security-Contact.
+
+  [ Xavier Guimard ]
+  * Declare compliance with policy 4.5.1
+  * New upstream version 6.2.1
+
+ -- Xavier Guimard <yadd@debian.org>  Thu, 17 Dec 2020 08:22:24 +0100
+
+node-commander (4.1.1-3) unstable; urgency=medium
+
+  * Team upload
+
+  [ lintian-brush ]
+  * Set upstream metadata fields: Bug-Submit, Security-Contact.
+  * Remove obsolete fields Contact, Name from debian/upstream/metadata
+    (already present in machine-readable debian/copyright)
+
+  [ Xavier Guimard ]
+  * Bump debhelper compatibility level to 13
+  * Modernize debian/watch
+  * Use dh-sequence-nodejs
+  * Remove useless build dependencies
+  * Enable upstream test using jest
+
+ -- Xavier Guimard <yadd@debian.org>  Sun, 15 Nov 2020 15:44:25 +0100
+
+node-commander (4.1.1-2) unstable; urgency=medium
+
+  * Team upload
+  * Back to unstable
+  * Add Breaks agains uglifyjs < 3.9.4-2~
+  * Add "Multi-Arch: foreign"
+
+ -- Xavier Guimard <yadd@debian.org>  Fri, 05 Jun 2020 15:42:42 +0200
+
+node-commander (4.1.1-1) experimental; urgency=medium
+
+  * Team upload
+  * New upstream version 4.1.1
+  * Remove patches
+  * Remove test (jest not available)
+
+ -- Xavier Guimard <yadd@debian.org>  Tue, 19 May 2020 09:19:41 +0200
+
+node-commander (4.0.1+really2.20.0-2) unstable; urgency=medium
+
+  * Team upload
+  * Ignore signal tests (fixes debci)
+
+ -- Xavier Guimard <yadd@debian.org>  Sat, 28 Mar 2020 07:45:08 +0100
+
+node-commander (4.0.1+really2.20.0-1) unstable; urgency=medium
+
+  * Team upload
+  * Downgrade version to 2.20.0 (Closes: #952335)
+  * Declare compliance with policy 4.5.0
+  * Remove myself from uploaders
+  * Add patch for sinon ≥ 7
+  * Restore test
+
+ -- Xavier Guimard <yadd@debian.org>  Tue, 24 Mar 2020 14:57:51 +0100
+
+node-commander (4.0.1-2) unstable; urgency=medium
+
+  * Back to unstable after successful tests
+
+ -- Xavier Guimard <yadd@debian.org>  Tue, 17 Dec 2019 22:19:58 +0100
+
+node-commander (4.0.1-1) experimental; urgency=medium
+
+  * Declare compliance with policy 4.4.1
+  * Add "Rules-Requires-Root: no"
+  * New upstream version 4.0.1
+  * Remove useless patch
+  * Disable upstream test (jest not packaged)
+
+ -- Xavier Guimard <yadd@debian.org>  Mon, 25 Nov 2019 07:10:35 +0100
+
+node-commander (2.12.2-4) unstable; urgency=medium
+
+  * Bump debhelper compatibility level to 12
+  * Declare compliance with policy 4.4.0
+  * Add debian/gbp.conf
+  * Switch install to pkg-js-tools
+
+ -- Xavier Guimard <yadd@debian.org>  Sat, 03 Aug 2019 15:42:29 +0200
+
+node-commander (2.12.2-3) unstable; urgency=medium
+
+  * Ignore signal based tests (Closes: #922093)
+
+ -- Xavier Guimard <yadd@debian.org>  Tue, 12 Feb 2019 22:25:03 +0100
+
+node-commander (2.12.2-2) unstable; urgency=medium
+
+  * Add upstream/metadata
+  * Bump debhelper compatibility level to 11
+  * Declare compliance with policy 4.3.0
+  * Update VCS fields to salsa
+  * Fix d/copyright format url
+  * Add myself to uploaders
+  * Increase tests timeouts (Closes: #895317)
+  * Switch tests to pkg-js-tools
+
+ -- Xavier Guimard <yadd@debian.org>  Mon, 11 Feb 2019 07:25:48 +0100
+
+node-commander (2.12.2-1) unstable; urgency=medium
+
+  * Team upload
+  * New upstream version 2.12.2
+  * Drop installchangelog override
+
+ -- Jérémy Lal <kapouer@melix.org>  Sat, 30 Dec 2017 00:18:38 +0100
+
+node-commander (2.11.0-1) unstable; urgency=medium
+
+  * Team upload.
+  * New upstream release (Closes: #872282)
+  * Update dependencies
+  * Fix 1 lintian warning
+
+ -- Paolo Greppi <paolo.greppi@libpf.com>  Tue, 31 Oct 2017 16:23:17 +0100
+
+node-commander (2.9.0-1) unstable; urgency=medium
+
+  * Team upload.
+  * Imported Upstream version 2.9.0
+  * Bump Standard-Version 4.1.1
+  * Bump debhelper compat 9
+  * Add build-dependency on node-graceful-readlink
+  * Run supplied tests during build as well
+  * Do not rename node to nodejs because of #862051
+
+ -- Paolo Greppi <paolo.greppi@libpf.com>  Thu, 21 Sep 2017 08:39:30 +0200
+
+node-commander (2.4.0-1) unstable; urgency=medium
+
+  * Imported Upstream version 2.4.0
+  * update Upstream-Contact to /issues url
+
+ -- Leo Iannacone <l3on@ubuntu.com>  Mon, 20 Oct 2014 18:32:53 +0200
+
+node-commander (2.3.0-1) unstable; urgency=medium
+
+  * Imported Upstream version 2.3.0
+  * Bump Standard-Version 3.9.6
+  * Do not install packages.json as doc
+  * Add autopkgtest suite
+
+ -- Leo Iannacone <l3on@ubuntu.com>  Fri, 17 Oct 2014 13:22:50 +0200
+
+node-commander (2.2.0-1) unstable; urgency=medium
+
+  [ Leo Iannacone ]
+  * New upstream release.
+  * Install package.json and index.js in nodejs/commander
+    folder instead of commander.js
+  * debian/control:
+    + bump standards-version 3.9.5
+    + set node-should as build-depends
+    + do not depend on keypress, not required
+    + added homogenius description for Node.js packages
+    + added myself as Uploader
+    + update Vcs-* fields, move project to pkg-javascript.
+  * debian/rules:
+    + enable tests
+    + remove override_dh_auto_install, no longer needed
+  * debian/patch/001_nodejs-shebangs.patch
+    + test/run patch to use nodejs command instead of node
+  * drop debian/lintian-overrides, not needed.
+
+ -- Mike Gabriel <sunweaver@debian.org>  Fri, 09 May 2014 15:15:25 +0200
+
+node-commander (2.0.0-1) unstable; urgency=low
+
+  * New upstream release.
+  * /debian/copyright:
+    + Use Expat instead of MIT as license keyword.
+  * /debian/docs:
+    + Install package.json into doc folder.
+  * /debian/patches/001_nodejs-shebangs.patch:
+    + Adapt patch, some example files have been remove by upstream.
+  * /debian/lintian-overrides:
+    + Adapt file to removed examples.
+
+ -- Mike Gabriel <sunweaver@debian.org>  Sat, 20 Jul 2013 01:12:09 +0200
+
+node-commander (1.1.1-2) unstable; urgency=low
+
+  * /debian/control:
+    + Fix versioned dependency on nodejs.
+
+ -- Mike Gabriel <sunweaver@debian.org>  Wed, 15 May 2013 11:10:56 +0200
+
+node-commander (1.1.1-1) unstable; urgency=low
+
+  * Initial release. (Closes: #707559).
+
+ -- Mike Gabriel <sunweaver@debian.org>  Thu, 09 May 2013 14:30:16 +0200
