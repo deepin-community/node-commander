@@ -1,19 +1,19 @@
 const commander = require('../');
 
-describe('unknownOption', () => {
+describe('unknownCommand', () => {
   // Optional. Use internal knowledge to suppress output to keep test output clean.
-  let consoleErrorSpy;
+  let writeErrorSpy;
 
   beforeAll(() => {
-    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
+    writeErrorSpy = jest.spyOn(process.stderr, 'write').mockImplementation(() => { });
   });
 
   afterEach(() => {
-    consoleErrorSpy.mockClear();
+    writeErrorSpy.mockClear();
   });
 
   afterAll(() => {
-    consoleErrorSpy.mockRestore();
+    writeErrorSpy.mockRestore();
   });
 
   test('when unknown argument in simple program then no error', () => {
@@ -24,12 +24,13 @@ describe('unknownOption', () => {
     }).not.toThrow();
   });
 
-  test('when unknown command but action handler then no error', () => {
+  test('when unknown command but action handler taking arg then no error', () => {
     const program = new commander.Command();
     program
       .exitOverride()
       .command('sub');
     program
+      .argument('[args...]')
       .action(() => { });
     expect(() => {
       program.parse('node test.js unknown'.split(' '));
@@ -56,6 +57,22 @@ describe('unknownOption', () => {
     let caughtErr;
     try {
       program.parse('node test.js unknown'.split(' '));
+    } catch (err) {
+      caughtErr = err;
+    }
+    expect(caughtErr.code).toBe('commander.unknownCommand');
+  });
+
+  test('when unknown command and unknown option then error is for unknown command', () => {
+    //  The unknown command is more useful since the option is for an unknown command (and might be
+    // ok if the command had been correctly spelled, say).
+    const program = new commander.Command();
+    program
+      .exitOverride()
+      .command('sub');
+    let caughtErr;
+    try {
+      program.parse('node test.js sbu --silly'.split(' '));
     } catch (err) {
       caughtErr = err;
     }

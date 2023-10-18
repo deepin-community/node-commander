@@ -5,7 +5,7 @@ and subtle issues in depth.
 
 - [Options taking varying numbers of option-arguments](#options-taking-varying-numbers-of-option-arguments)
   - [Parsing ambiguity](#parsing-ambiguity)
-    - [Alternative: Make  `--` part of your syntax](#alternative-make----part-of-your-syntax)
+    - [Alternative: Make  `--` part of your syntax](#alternative-make-----part-of-your-syntax)
     - [Alternative: Put options last](#alternative-put-options-last)
     - [Alternative: Use options instead of command-arguments](#alternative-use-options-instead-of-command-arguments)
   - [Combining short options, and options taking arguments](#combining-short-options-and-options-taking-arguments)
@@ -34,7 +34,7 @@ intend the argument following the option as a command or command-argument.
 ```js
 program
   .name('cook')
-  .arguments('[technique]')
+  .argument('[technique]')
   .option('-i, --ingredient [ingredient]', 'add cheese or given ingredient')
   .action((technique, options) => {
     console.log(`technique: ${technique}`);
@@ -66,8 +66,8 @@ ingredient: scrambled
 The explicit way to resolve this is use `--` to indicate the end of the options and option-arguments:
 
 ```sh
-$ node cook.js -i -- egg
-technique: egg
+$ node cook.js -i -- scrambled
+technique: scrambled
 ingredient: cheese
 ```
 

@@ -87,3 +87,38 @@ test('when set aliases then can get aliases', () => {
   program.aliases(aliases);
   expect(program.aliases()).toEqual(aliases);
 });
+
+test('when set alias on executable then can get alias', () => {
+  const program = new commander.Command();
+  const alias = 'abcde';
+  program
+    .command('external', 'external command')
+    .alias(alias);
+  expect(program.commands[0].alias()).toEqual(alias);
+});
+
+describe('aliases parameter is treated as readonly, per TypeScript declaration', () => {
+  test('when aliases called then parameter does not change', () => {
+    // Unlikely this could break, but check the API we are declaring in TypeScript.
+    const original = ['b', 'bld'];
+    const param = original.slice();
+    new commander.Command('build').aliases(param);
+    expect(param).toEqual(original);
+  });
+
+  test('when aliases called and aliases later changed then parameter does not change', () => {
+    const original = ['b', 'bld'];
+    const param = original.slice();
+    const cmd = new commander.Command('build').aliases(param);
+    cmd.alias('BBB');
+    expect(param).toEqual(original);
+  });
+
+  test('when aliases called and parameter later changed then aliases does not change', () => {
+    const original = ['b', 'bld'];
+    const param = original.slice();
+    const cmd = new commander.Command('build').aliases(param);
+    param.length = 0;
+    expect(cmd.aliases()).toEqual(original);
+  });
+});

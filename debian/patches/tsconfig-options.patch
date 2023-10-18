@@ -1,0 +1,14 @@
+Description: fix tsconfig.json types options
+Author: Ayoyimika Ajibade <ayoyimikaajibade@gmail.com>
+Forwarded: not-needed
+Last-Update: 2021-12-17
+--- a/tsconfig.json
++++ b/tsconfig.json
+@@ -7,6 +7,7 @@
+         "noImplicitAny": true,
+         "noImplicitThis": true,
+         "strictNullChecks": true,
++        "typeRoots": [ "./node_modules/@types" ],
+         "types": [
+           "node",
+           "jest"

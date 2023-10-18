@@ -11,18 +11,8 @@ const commander = require('../');
 // Historical: the event 'command:*' used to also be shared by the action handler on the program.
 
 describe(".command('*')", () => {
-  // Use internal knowledge to suppress output to keep test output clean.
-  let writeMock;
-
-  beforeAll(() => {
-    writeMock = jest.spyOn(process.stdout, 'write').mockImplementation(() => { });
-  });
-
-  afterAll(() => {
-    writeMock.mockRestore();
-  });
-
   test('when no arguments then asterisk action not called', () => {
+    const writeMock = jest.spyOn(process.stderr, 'write').mockImplementation(() => { });
     const mockAction = jest.fn();
     const program = new commander.Command();
     program
@@ -32,9 +22,10 @@ describe(".command('*')", () => {
     try {
       program.parse(['node', 'test']);
     } catch (err) {
-      ;
+
     }
     expect(mockAction).not.toHaveBeenCalled();
+    writeMock.mockRestore();
   });
 
   test('when unrecognised argument then asterisk action called', () => {
@@ -42,6 +33,7 @@ describe(".command('*')", () => {
     const program = new commander.Command();
     program
       .command('*')
+      .argument('[args...]')
       .action(mockAction);
     program.parse(['node', 'test', 'unrecognised-command']);
     expect(mockAction).toHaveBeenCalled();
@@ -67,9 +59,49 @@ describe(".command('*')", () => {
       .command('install');
     program
       .command('*')
+      .argument('[args...]')
       .action(mockAction);
     program.parse(['node', 'test', 'unrecognised-command']);
     expect(mockAction).toHaveBeenCalled();
+  });
+
+  test('when unrecognised argument and known option then asterisk action called', () => {
+    // This tests for a regression between v4 and v5. Known default option should not be rejected by program.
+    const mockAction = jest.fn();
+    const program = new commander.Command();
+    program
+      .command('install');
+    const star = program
+      .command('*')
+      .argument('[args...]')
+      .option('-d, --debug')
+      .action(mockAction);
+    program.parse(['node', 'test', 'unrecognised-command', '--debug']);
+    expect(mockAction).toHaveBeenCalled();
+    expect(star.opts().debug).toEqual(true);
+  });
+
+  test('when non-command argument and unknown option then error for unknown option', () => {
+    // This is a change in behaviour from v2 which did not error, but is consistent with modern better detection of invalid options
+    const mockAction = jest.fn();
+    const program = new commander.Command();
+    program
+      .exitOverride()
+      .configureOutput({
+        writeErr: () => {}
+      })
+      .command('install');
+    program
+      .command('*')
+      .argument('[args...]')
+      .action(mockAction);
+    let caughtErr;
+    try {
+      program.parse(['node', 'test', 'some-argument', '--unknown']);
+    } catch (err) {
+      caughtErr = err;
+    }
+    expect(caughtErr.code).toEqual('commander.unknownOption');
   });
 });
 
@@ -113,6 +145,20 @@ describe(".on('command:*')", () => {
     program
       .on('command:*', mockAction);
     program.parse(['node', 'test', 'unrecognised-command']);
+    expect(mockAction).toHaveBeenCalled();
+  });
+
+  test('when unrecognised command/argument and unknown option then listener called', () => {
+    // Give listener a chance to make a suggestion for misspelled command. The option
+    // could only be unknown because the command is not correct.
+    // Regression identified in https://github.com/tj/commander.js/issues/1460#issuecomment-772313494
+    const mockAction = jest.fn();
+    const program = new commander.Command();
+    program
+      .command('install');
+    program
+      .on('command:*', mockAction);
+    program.parse(['node', 'test', 'intsall', '--unknown']);
     expect(mockAction).toHaveBeenCalled();
   });
 });

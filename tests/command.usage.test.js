@@ -6,7 +6,7 @@ test('when default usage and check program help then starts with default usage',
   program.name('test');
   const helpInformation = program.helpInformation();
 
-  expect(helpInformation).toMatch(new RegExp('^Usage: test \\[options\\]'));
+  expect(helpInformation).toMatch(/^Usage: test \[options\]/);
 });
 
 test('when custom usage and check program help then starts with custom usage', () => {
@@ -29,7 +29,7 @@ test('when default usage and check subcommand help then starts with default usag
   program.name('test');
   const helpInformation = subCommand.helpInformation();
 
-  expect(helpInformation).toMatch(new RegExp('^Usage: test info \\[options\\]'));
+  expect(helpInformation).toMatch(/^Usage: test info \[options\]/);
 });
 
 test('when custom usage and check subcommand help then starts with custom usage including program name', () => {
@@ -78,20 +78,20 @@ test('when no commands then [command] not included in usage', () => {
   expect(program.usage()).not.toMatch('[command]');
 });
 
-test('when arguments then arguments included in usage', () => {
+test('when argument then argument included in usage', () => {
   const program = new commander.Command();
 
   program
-    .arguments('<file>');
+    .argument('<file>');
 
   expect(program.usage()).toMatch('<file>');
 });
 
-test('when options and command and arguments then all three included in usage', () => {
+test('when options and command and argument then all three included in usage', () => {
   const program = new commander.Command();
 
   program
-    .arguments('<file>')
+    .argument('<file>')
     .option('--alpha')
     .command('beta');
 

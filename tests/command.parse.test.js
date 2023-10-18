@@ -4,7 +4,7 @@ const commander = require('../');
 // https://github.com/electron/electron/issues/4690#issuecomment-217435222
 // https://www.electronjs.org/docs/api/process#processdefaultapp-readonly
 
-describe('.parse() user args', () => {
+describe('.parse() args from', () => {
   test('when no args then use process.argv and app/script/args', () => {
     const program = new commander.Command();
     const hold = process.argv;
@@ -14,7 +14,16 @@ describe('.parse() user args', () => {
     expect(program.args).toEqual(['user']);
   });
 
-  // implicit also supports detecting electron but more implementation knowledge required than useful to test
+  test('when no args and electron properties and not default app then use process.argv and app/args', () => {
+    const program = new commander.Command();
+    const holdArgv = process.argv;
+    process.versions.electron = '1.2.3';
+    process.argv = 'node user'.split(' ');
+    program.parse();
+    delete process.versions.electron;
+    process.argv = holdArgv;
+    expect(program.args).toEqual(['user']);
+  });
 
   test('when args then app/script/args', () => {
     const program = new commander.Command();
@@ -51,6 +60,13 @@ describe('.parse() user args', () => {
     program.parse('user'.split(' '), { from: 'user' });
     expect(program.args).toEqual(['user']);
   });
+
+  test('when args from "silly" then throw', () => {
+    const program = new commander.Command();
+    expect(() => {
+      program.parse(['node', 'script.js'], { from: 'silly' });
+    }).toThrow();
+  });
 });
 
 describe('return type', () => {
@@ -70,5 +86,81 @@ describe('return type', () => {
 
     const result = await program.parseAsync(['node', 'test']);
     expect(result).toBe(program);
+  });
+});
+
+// Easy mistake to make when writing unit tests
+test('when parse strings instead of array then throw', () => {
+  const program = new commander.Command();
+  expect(() => {
+    program.parse('node', 'test');
+  }).toThrow();
+});
+
+describe('parse parameter is treated as readonly, per TypeScript declaration', () => {
+  test('when parse called then parameter does not change', () => {
+    const program = new commander.Command();
+    program.option('--debug');
+    const original = ['node', '--debug', 'arg'];
+    const param = original.slice();
+    program.parse(param);
+    expect(param).toEqual(original);
+  });
+
+  test('when parse called and parsed args later changed then parameter does not change', () => {
+    const program = new commander.Command();
+    program.option('--debug');
+    const original = ['node', '--debug', 'arg'];
+    const param = original.slice();
+    program.parse(param);
+    program.args.length = 0;
+    program.rawArgs.length = 0;
+    expect(param).toEqual(original);
+  });
+
+  test('when parse called and param later changed then parsed args do not change', () => {
+    const program = new commander.Command();
+    program.option('--debug');
+    const param = ['node', '--debug', 'arg'];
+    program.parse(param);
+    const oldArgs = program.args.slice();
+    const oldRawArgs = program.rawArgs.slice();
+    param.length = 0;
+    expect(program.args).toEqual(oldArgs);
+    expect(program.rawArgs).toEqual(oldRawArgs);
+  });
+});
+
+describe('parseAsync parameter is treated as readonly, per TypeScript declaration', () => {
+  test('when parse called then parameter does not change', async() => {
+    const program = new commander.Command();
+    program.option('--debug');
+    const original = ['node', '--debug', 'arg'];
+    const param = original.slice();
+    await program.parseAsync(param);
+    expect(param).toEqual(original);
+  });
+
+  test('when parseAsync called and parsed args later changed then parameter does not change', async() => {
+    const program = new commander.Command();
+    program.option('--debug');
+    const original = ['node', '--debug', 'arg'];
+    const param = original.slice();
+    await program.parseAsync(param);
+    program.args.length = 0;
+    program.rawArgs.length = 0;
+    expect(param).toEqual(original);
+  });
+
+  test('when parseAsync called and param later changed then parsed args do not change', async() => {
+    const program = new commander.Command();
+    program.option('--debug');
+    const param = ['node', '--debug', 'arg'];
+    await program.parseAsync(param);
+    const oldArgs = program.args.slice();
+    const oldRawArgs = program.rawArgs.slice();
+    param.length = 0;
+    expect(program.args).toEqual(oldArgs);
+    expect(program.rawArgs).toEqual(oldRawArgs);
   });
 });

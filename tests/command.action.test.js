@@ -9,7 +9,17 @@ test('when .action called then command passed to action', () => {
     .command('info')
     .action(actionMock);
   program.parse(['node', 'test', 'info']);
-  expect(actionMock).toHaveBeenCalledWith(cmd);
+  expect(actionMock).toHaveBeenCalledWith(cmd.opts(), cmd);
+});
+
+test('when .action called then this is set to command', () => {
+  const program = new commander.Command();
+  let actionThis;
+  const cmd = program
+    .command('info')
+    .action(function() { actionThis = this; });
+  program.parse(['node', 'test', 'info']);
+  expect(actionThis).toBe(cmd);
 });
 
 test('when .action called then program.args only contains args', () => {
@@ -23,42 +33,23 @@ test('when .action called then program.args only contains args', () => {
   expect(program.args).toEqual(['info', 'my-file']);
 });
 
-test('when .action called with extra arguments then extras also passed to action', () => {
-  // This is a new and undocumented behaviour for now.
-  // Might make this an error by default in future.
+test.each(getTestCases('<file>'))('when .action on program with required argument via %s and argument supplied then action called', (methodName, program) => {
   const actionMock = jest.fn();
-  const program = new commander.Command();
-  const cmd = program
-    .command('info <file>')
-    .action(actionMock);
-  program.parse(['node', 'test', 'info', 'my-file', 'a']);
-  expect(actionMock).toHaveBeenCalledWith('my-file', cmd, ['a']);
-});
-
-test('when .action on program with required argument and argument supplied then action called', () => {
-  const actionMock = jest.fn();
-  const program = new commander.Command();
-  program
-    .arguments('<file>')
-    .action(actionMock);
+  program.action(actionMock);
   program.parse(['node', 'test', 'my-file']);
-  expect(actionMock).toHaveBeenCalledWith('my-file', program);
+  expect(actionMock).toHaveBeenCalledWith('my-file', program.opts(), program);
 });
 
-test('when .action on program with required argument and argument not supplied then action not called', () => {
-  // Optional. Use internal knowledge to suppress output to keep test output clean.
-  const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
+test.each(getTestCases('<file>'))('when .action on program with required argument via %s and argument not supplied then action not called', (methodName, program) => {
   const actionMock = jest.fn();
-  const program = new commander.Command();
   program
     .exitOverride()
-    .arguments('<file>')
+    .configureOutput({ writeErr: () => {} })
     .action(actionMock);
   expect(() => {
     program.parse(['node', 'test']);
   }).toThrow();
   expect(actionMock).not.toHaveBeenCalled();
-  consoleErrorSpy.mockRestore();
 });
 
 // Changes made in #729 to call program action handler
@@ -68,56 +59,43 @@ test('when .action on program and no arguments then action called', () => {
   program
     .action(actionMock);
   program.parse(['node', 'test']);
-  expect(actionMock).toHaveBeenCalledWith(program);
+  expect(actionMock).toHaveBeenCalledWith(program.opts(), program);
 });
 
-test('when .action on program with optional argument supplied then action called', () => {
+test.each(getTestCases('[file]'))('when .action on program with optional argument via %s supplied then action called', (methodName, program) => {
   const actionMock = jest.fn();
-  const program = new commander.Command();
-  program
-    .arguments('[file]')
-    .action(actionMock);
+  program.action(actionMock);
   program.parse(['node', 'test', 'my-file']);
-  expect(actionMock).toHaveBeenCalledWith('my-file', program);
+  expect(actionMock).toHaveBeenCalledWith('my-file', program.opts(), program);
 });
 
-test('when .action on program without optional argument supplied then action called', () => {
+test.each(getTestCases('[file]'))('when .action on program without optional argument supplied then action called', (methodName, program) => {
   const actionMock = jest.fn();
-  const program = new commander.Command();
-  program
-    .arguments('[file]')
-    .action(actionMock);
+  program.action(actionMock);
   program.parse(['node', 'test']);
-  expect(actionMock).toHaveBeenCalledWith(undefined, program);
+  expect(actionMock).toHaveBeenCalledWith(undefined, program.opts(), program);
 });
 
-test('when .action on program with optional argument and subcommand and program argument then program action called', () => {
+test.each(getTestCases('[file]'))('when .action on program with optional argument via %s and subcommand and program argument then program action called', (methodName, program) => {
   const actionMock = jest.fn();
-  const program = new commander.Command();
-  program
-    .arguments('[file]')
-    .action(actionMock);
+  program.action(actionMock);
   program
     .command('subcommand');
 
   program.parse(['node', 'test', 'a']);
 
-  expect(actionMock).toHaveBeenCalledWith('a', program);
+  expect(actionMock).toHaveBeenCalledWith('a', program.opts(), program);
 });
 
 // Changes made in #1062 to allow this case
-test('when .action on program with optional argument and subcommand and no program argument then program action called', () => {
+test.each(getTestCases('[file]'))('when .action on program with optional argument via %s and subcommand and no program argument then program action called', (methodName, program) => {
   const actionMock = jest.fn();
-  const program = new commander.Command();
-  program
-    .arguments('[file]')
-    .action(actionMock);
-  program
-    .command('subcommand');
+  program.action(actionMock);
+  program.command('subcommand');
 
   program.parse(['node', 'test']);
 
-  expect(actionMock).toHaveBeenCalledWith(undefined, program);
+  expect(actionMock).toHaveBeenCalledWith(undefined, program.opts(), program);
 });
 
 test('when action is async then can await parseAsync', async() => {
@@ -125,7 +103,7 @@ test('when action is async then can await parseAsync', async() => {
   async function delay() {
     await new Promise(resolve => setTimeout(resolve, 100));
     asyncFinished = true;
-  };
+  }
   const program = new commander.Command();
   program
     .action(delay);
@@ -135,3 +113,10 @@ test('when action is async then can await parseAsync', async() => {
   await later;
   expect(asyncFinished).toBe(true);
 });
+
+function getTestCases(arg) {
+  const withArguments = new commander.Command().arguments(arg);
+  const withArgument = new commander.Command().argument(arg);
+  const withAddArgument = new commander.Command().addArgument(new commander.Argument(arg));
+  return [['.arguments', withArguments], ['.argument', withArgument], ['.addArgument', withAddArgument]];
+}
