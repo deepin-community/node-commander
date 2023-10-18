@@ -21,6 +21,22 @@ describe('help command listed in helpInformation', () => {
     expect(helpInformation).toMatch(/help \[command\]/);
   });
 
+  test('when program has subcommands and specify only unknown option then display help', () => {
+    const program = new commander.Command();
+    program
+      .configureHelp({ formatHelp: () => '' })
+      .exitOverride()
+      .allowUnknownOption()
+      .command('foo');
+    let caughtErr;
+    try {
+      program.parse(['--unknown'], { from: 'user' });
+    } catch (err) {
+      caughtErr = err;
+    }
+    expect(caughtErr.code).toEqual('commander.help');
+  });
+
   test('when program has subcommands and suppress help command then no help command', () => {
     const program = new commander.Command();
     program.addHelpCommand(false);
@@ -31,29 +47,29 @@ describe('help command listed in helpInformation', () => {
 
   test('when add custom help command then custom help command', () => {
     const program = new commander.Command();
-    program.addHelpCommand('help command', 'help description');
+    program.addHelpCommand('myHelp', 'help description');
     const helpInformation = program.helpInformation();
-    expect(helpInformation).toMatch(/help command +help description/);
+    expect(helpInformation).toMatch(/myHelp +help description/);
   });
 });
 
 describe('help command processed on correct command', () => {
   // Use internal knowledge to suppress output to keep test output clean.
-  let consoleErrorSpy;
+  let writeErrorSpy;
   let writeSpy;
 
   beforeAll(() => {
-    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
+    writeErrorSpy = jest.spyOn(process.stderr, 'write').mockImplementation(() => { });
     writeSpy = jest.spyOn(process.stdout, 'write').mockImplementation(() => { });
   });
 
   afterEach(() => {
-    consoleErrorSpy.mockClear();
+    writeErrorSpy.mockClear();
     writeSpy.mockClear();
   });
 
   afterAll(() => {
-    consoleErrorSpy.mockRestore();
+    writeErrorSpy.mockRestore();
     writeSpy.mockRestore();
   });
 
@@ -64,6 +80,16 @@ describe('help command processed on correct command', () => {
     program.exitOverride(() => { throw new Error('program'); });
     expect(() => {
       program.parse('node test.js help'.split(' '));
+    }).toThrow('program');
+  });
+
+  test('when "program help unknown" then program', () => {
+    const program = new commander.Command();
+    program.exitOverride();
+    program.command('sub1');
+    program.exitOverride(() => { throw new Error('program'); });
+    expect(() => {
+      program.parse('node test.js help unknown'.split(' '));
     }).toThrow('program');
   });
 

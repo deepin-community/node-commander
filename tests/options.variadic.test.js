@@ -2,19 +2,15 @@ const commander = require('../');
 
 describe('variadic option with required value', () => {
   test('when variadic with value missing then error', () => {
-    // Optional. Use internal knowledge to suppress output to keep test output clean.
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
-
     const program = new commander.Command();
     program
       .exitOverride()
+      .configureOutput({ writeErr: jest.fn() })
       .option('-r,--required <value...>');
 
     expect(() => {
       program.parse(['--required'], { from: 'user' });
     }).toThrow();
-
-    consoleErrorSpy.mockRestore();
   });
 
   test('when variadic with one value then set in array', () => {
@@ -44,11 +40,29 @@ describe('variadic option with required value', () => {
     expect(program.opts().required).toEqual(['one', 'two']);
   });
 
+  test('when variadic used with choices and one value then set in array', () => {
+    const program = new commander.Command();
+    program
+      .addOption(new commander.Option('-r,--required <value...>').choices(['one', 'two']));
+
+    program.parse(['--required', 'one'], { from: 'user' });
+    expect(program.opts().required).toEqual(['one']);
+  });
+
+  test('when variadic used with choices and two values then set in array', () => {
+    const program = new commander.Command();
+    program
+      .addOption(new commander.Option('-r,--required <value...>').choices(['one', 'two']));
+
+    program.parse(['--required', 'one', 'two'], { from: 'user' });
+    expect(program.opts().required).toEqual(['one', 'two']);
+  });
+
   test('when variadic with short combined argument then not variadic', () => {
     const program = new commander.Command();
     program
       .option('-r,--required <value...>')
-      .arguments('[arg]');
+      .argument('[arg]');
 
     program.parse(['-rone', 'operand'], { from: 'user' });
     expect(program.opts().required).toEqual(['one']);
@@ -58,7 +72,7 @@ describe('variadic option with required value', () => {
     const program = new commander.Command();
     program
       .option('-r,--required <value...>')
-      .arguments('[arg]');
+      .argument('[arg]');
 
     program.parse(['--required=one', 'operand'], { from: 'user' });
     expect(program.opts().required).toEqual(['one']);
@@ -69,7 +83,7 @@ describe('variadic option with required value', () => {
     program
       .option('-r,--required <value...>')
       .option('-f, --flag')
-      .arguments('[arg]');
+      .argument('[arg]');
 
     program.parse(['-r', 'one', '-f'], { from: 'user' });
     const opts = program.opts();

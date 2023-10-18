@@ -2,22 +2,22 @@ const commander = require('../');
 
 describe('helpOption', () => {
   let writeSpy;
-  let consoleErrorSpy;
+  let writeErrorSpy;
 
   beforeAll(() => {
     // Optional. Suppress expected output to keep test output clean.
     writeSpy = jest.spyOn(process.stdout, 'write').mockImplementation(() => { });
-    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
+    writeErrorSpy = jest.spyOn(process.stderr, 'write').mockImplementation(() => { });
   });
 
   afterEach(() => {
     writeSpy.mockClear();
-    consoleErrorSpy.mockClear();
+    writeErrorSpy.mockClear();
   });
 
   afterAll(() => {
     writeSpy.mockRestore();
-    consoleErrorSpy.mockRestore();
+    writeErrorSpy.mockRestore();
   });
 
   test('when helpOption has custom flags then custom short flag invokes help', () => {
@@ -68,6 +68,22 @@ describe('helpOption', () => {
     expect(helpInformation).toMatch(/-C,--custom-help +custom help output/);
   });
 
+  test('when helpOption has just flags then helpInformation includes default description', () => {
+    const program = new commander.Command();
+    program
+      .helpOption('-C,--custom-help');
+    const helpInformation = program.helpInformation();
+    expect(helpInformation).toMatch(/-C,--custom-help +display help for command/);
+  });
+
+  test('when helpOption has just description then helpInformation includes default flags', () => {
+    const program = new commander.Command();
+    program
+      .helpOption(undefined, 'custom help output');
+    const helpInformation = program.helpInformation();
+    expect(helpInformation).toMatch(/-h, --help +custom help output/);
+  });
+
   test('when helpOption(false) then helpInformation does not include --help', () => {
     const program = new commander.Command();
     program
@@ -112,6 +128,6 @@ describe('helpOption', () => {
       .command('foo');
     expect(() => {
       program.parse(['UNKNOWN'], { from: 'user' });
-    }).toThrow("error: unknown command 'UNKNOWN'.");
+    }).toThrow("error: unknown command 'UNKNOWN'");
   });
 });

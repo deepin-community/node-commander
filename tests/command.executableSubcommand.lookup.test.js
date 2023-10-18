@@ -4,8 +4,10 @@ const util = require('util');
 const execFileAsync = util.promisify(childProcess.execFile);
 
 // Calling node explicitly so pm works without file suffix cross-platform.
+// This file does end-to-end tests actually spawning program.
+// See also command.executableSubcommand.search.test.js
 
-// Get false positives due to use of testOrSkipOnWindows
+// Suppress false positive warnings due to use of testOrSkipOnWindows
 /* eslint-disable jest/no-standalone-expect */
 
 const testOrSkipOnWindows = (process.platform === 'win32') ? test.skip : test;
@@ -20,7 +22,7 @@ test('when subcommand file missing then error', () => {
       expect(err.stderr).toBeDefined();
     } else {
       // eslint-disable-next-line jest/no-conditional-expect
-      expect(err.stderr).toMatch(new RegExp(/Error: 'pm-list' does not exist/));
+      expect(err.stderr).toMatch(/Error: 'pm-list' does not exist/);
     }
   });
 });
@@ -34,7 +36,7 @@ test('when alias subcommand file missing then error', () => {
       expect(err.stderr).toBeDefined();
     } else {
       // eslint-disable-next-line jest/no-conditional-expect
-      expect(err.stderr).toMatch(new RegExp(/Error: 'pm-list' does not exist/));
+      expect(err.stderr).toMatch(/Error: 'pm-list' does not exist/);
     }
   });
 });
@@ -83,11 +85,23 @@ testOrSkipOnWindows('when subcommand file is double symlink then lookup succeeds
 
 test('when subcommand suffix is .ts then lookup succeeds', async() => {
   // We support looking for ts files for ts-node in particular, but don't need to test ts-node itself.
-  // The program and the subcommand `pm-install.ts` are both plain JavaScript code.
-  const binLinkTs = path.join(__dirname, 'fixtures-ts', 'pm.ts');
+  // The subcommand is both plain JavaScript code for this test.
+  const binLinkTs = path.join(__dirname, 'fixtures-extensions', 'pm.js');
   // childProcess.execFile('node', ['-r', 'ts-node/register', binLinkTs, 'install'], function(_error, stdout, stderr) {
-  const { stdout } = await execFileAsync('node', [binLinkTs, 'install']);
-  expect(stdout).toBe('install\n');
+  const { stdout } = await execFileAsync('node', [binLinkTs, 'try-ts']);
+  expect(stdout).toBe('found .ts\n');
+});
+
+test('when subcommand suffix is .cjs then lookup succeeds', async() => {
+  const binLinkTs = path.join(__dirname, 'fixtures-extensions', 'pm.js');
+  const { stdout } = await execFileAsync('node', [binLinkTs, 'try-cjs']);
+  expect(stdout).toBe('found .cjs\n');
+});
+
+test('when subcommand suffix is .mjs then lookup succeeds', async() => {
+  const binLinkTs = path.join(__dirname, 'fixtures-extensions', 'pm.js');
+  const { stdout } = await execFileAsync('node', [binLinkTs, 'try-mjs']);
+  expect(stdout).toBe('found .mjs\n');
 });
 
 test('when subsubcommand then lookup sub-sub-command', async() => {

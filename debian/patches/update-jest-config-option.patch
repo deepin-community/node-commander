@@ -1,0 +1,15 @@
+Description: fix jest options
+Author: Ayoyimika Ajibade <ayoyimikaajibade@gmail.com>
+Forwarded: not-needed
+Last-Update: 2021-12-17
+--- a/package.json
++++ b/package.json
+@@ -67,7 +67,7 @@
+     "testEnvironment": "node",
+     "collectCoverage": true,
+     "transform": {
+-      "^.+\\.tsx?$": "ts-jest"
++      "^.+\\.tsx?$": "/usr/share/nodejs/ts-jest/"
+     },
+     "testPathIgnorePatterns": [
+       "/node_modules/"

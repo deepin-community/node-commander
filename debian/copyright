@@ -12,6 +12,7 @@ Files: debian/*
 Copyright:
  2013, Mike Gabriel <mike.gabriel@das-netzwerkteam.de>
  2016-2017, Paolo Greppi <paolo.greppi@libpf.com>
+ 2019-2022, Yadd <yadd@debian.org>
 License: Expat
 
 License: Expat
